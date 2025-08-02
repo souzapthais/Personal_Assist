@@ -1,237 +1,214 @@
 # 🚀 Guia de Deploy - Canoa Fit Pro
 
-Este guia explica como fazer o deploy da aplicação Canoa Fit Pro em diferentes plataformas.
-
 ## 📋 Pré-requisitos
 
-- Node.js 18+
-- pnpm ou npm
-- Conta na plataforma de deploy escolhida
+- Conta no [Vercel](https://vercel.com)
+- Repositório no GitHub/GitLab/Bitbucket
+- Node.js 18+ instalado localmente
 
-## 🌐 Opções de Deploy
+## 🚀 Deploy Automático no Vercel
 
-### 1. Vercel (Recomendado)
-
-**Vantagens**: Deploy automático, domínio gratuito, integração com Git
+### 1. Preparação do Projeto
 
 ```bash
-# Instalar Vercel CLI
-npm i -g vercel
+# Clone o repositório
+git clone <seu-repositorio>
+cd Personal_Assist
 
-# Na pasta do projeto
-vercel
+# Instale as dependências
+npm install
 
-# Seguir as instruções interativas
+# Teste o build localmente
+npm run build
+
+# Teste o projeto
+npm run dev
 ```
 
-**Deploy via GitHub**:
-1. Conecte seu repositório ao Vercel
-2. Configure as variáveis de build:
-   - Build Command: `pnpm run build`
-   - Output Directory: `dist`
-3. Deploy automático a cada push
+### 2. Configuração no Vercel
 
-### 2. Netlify
+1. **Acesse o Vercel Dashboard**
+   - Vá para [vercel.com](https://vercel.com)
+   - Faça login com sua conta
 
-**Vantagens**: Interface amigável, funcionalidades extras
+2. **Importe o Projeto**
+   - Clique em "New Project"
+   - Conecte seu repositório GitHub/GitLab/Bitbucket
+   - Selecione o repositório `Personal_Assist`
 
-```bash
-# Instalar Netlify CLI
-npm install -g netlify-cli
+3. **Configurações do Projeto**
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `npm install`
 
-# Build da aplicação
-pnpm run build
+4. **Variáveis de Ambiente** (se necessário)
+   - Não são necessárias para este projeto
+   - Todos os dados são armazenados localmente
 
-# Deploy
-netlify deploy --prod --dir=dist
-```
+### 3. Deploy Automático
 
-**Deploy via GitHub**:
-1. Conecte seu repositório ao Netlify
-2. Configure:
-   - Build command: `pnpm run build`
-   - Publish directory: `dist`
+O Vercel detectará automaticamente as configurações:
+- ✅ Framework: Vite
+- ✅ Build Command: `npm run build`
+- ✅ Output Directory: `dist`
+- ✅ Node.js Version: 18.x
 
-### 3. GitHub Pages
+### 4. Configurações Avançadas
 
-**Vantagens**: Gratuito para repositórios públicos
-
-1. Instalar gh-pages:
-```bash
-npm install --save-dev gh-pages
-```
-
-2. Adicionar scripts no `package.json`:
+#### Headers de Segurança
+O arquivo `vercel.json` já inclui headers de segurança:
 ```json
 {
-  "scripts": {
-    "predeploy": "pnpm run build",
-    "deploy": "gh-pages -d dist"
-  }
-}
-```
-
-3. Configurar `vite.config.js`:
-```javascript
-export default defineConfig({
-  base: '/canoa-fit-pro/', // nome do repositório
-  // ... resto da config
-})
-```
-
-4. Deploy:
-```bash
-pnpm run deploy
-```
-
-### 4. Firebase Hosting
-
-**Vantagens**: Integração com outros serviços Google
-
-```bash
-# Instalar Firebase CLI
-npm install -g firebase-tools
-
-# Login
-firebase login
-
-# Inicializar projeto
-firebase init hosting
-
-# Build e deploy
-pnpm run build
-firebase deploy
-```
-
-## ⚙️ Configurações de Build
-
-### Variáveis de Ambiente
-
-Se necessário, crie um arquivo `.env.production`:
-
-```env
-VITE_APP_TITLE=Canoa Fit Pro
-VITE_API_URL=https://api.canoafitpro.com
-```
-
-### Otimizações de Build
-
-O projeto já está configurado com:
-- ✅ Minificação automática
-- ✅ Tree shaking
-- ✅ Code splitting
-- ✅ Asset optimization
-
-### Build Manual
-
-```bash
-# Instalar dependências
-pnpm install
-
-# Build de produção
-pnpm run build
-
-# Preview local
-pnpm run preview
-
-# Arquivos gerados em: dist/
-```
-
-## 🔧 Configurações Específicas
-
-### Vercel (`vercel.json`)
-
-```json
-{
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
   ]
 }
 ```
 
-### Netlify (`_redirects` em `public/`)
+#### Região de Deploy
+- **Região**: Brasil (gru1) para melhor performance
+- **CDN**: Distribuição global automática
 
+### 5. Domínio Personalizado (Opcional)
+
+1. **Adicione um domínio personalizado**
+   - Vá para Settings > Domains
+   - Adicione seu domínio
+   - Configure os registros DNS
+
+2. **SSL Automático**
+   - O Vercel fornece SSL gratuito
+   - Certificado renovado automaticamente
+
+## 🔧 Troubleshooting
+
+### Problemas Comuns
+
+#### 1. Build Falhando
+```bash
+# Verifique se o build funciona localmente
+npm run build
+
+# Verifique as dependências
+npm install
+
+# Limpe o cache
+npm run build -- --force
 ```
-/*    /index.html   200
+
+#### 2. Erro de Dependências
+```bash
+# Remova node_modules e reinstale
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-### Apache (`.htaccess` em `dist/`)
+#### 3. Problemas de CSS
+- Verifique se o Tailwind CSS está configurado corretamente
+- Certifique-se de que o arquivo `index.css` está sendo importado
 
-```apache
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteBase /
-  RewriteRule ^index\.html$ - [L]
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteRule . /index.html [L]
-</IfModule>
+### Logs de Deploy
+
+1. **Acesse os logs no Vercel Dashboard**
+   - Vá para o projeto no Vercel
+   - Clique em "Deployments"
+   - Selecione o deploy mais recente
+   - Clique em "View Build Logs"
+
+2. **Logs Locais**
+```bash
+# Teste o build localmente
+npm run build
+
+# Verifique se não há erros
+npm run lint
 ```
 
 ## 📊 Monitoramento
 
-### Analytics (Opcional)
+### Métricas Automáticas
+- **Performance**: Core Web Vitals
+- **Uptime**: 99.9% garantido
+- **Analytics**: Integração com Google Analytics (opcional)
 
-Adicionar Google Analytics ou similar:
+### Alertas
+- Deploy falhando
+- Performance degradada
+- Erros de runtime
 
-```javascript
-// Em src/main.jsx
-import { analytics } from './lib/analytics'
+## 🔄 Deploy Contínuo
 
-// Configurar tracking
-```
+### Configuração Automática
+- **Push para main**: Deploy automático
+- **Pull Requests**: Preview deployments
+- **Branch Protection**: Deploy apenas após review
 
-### Performance
+### Workflow Recomendado
+1. **Desenvolvimento**: Branch `develop`
+2. **Teste**: Pull Request para `main`
+3. **Deploy**: Merge automático para produção
 
-- ✅ Lighthouse Score: 90+
-- ✅ Core Web Vitals otimizados
-- ✅ Imagens otimizadas
-- ✅ Lazy loading implementado
+## 📞 Suporte
 
-## 🚨 Troubleshooting
+### Contato Técnico
+- **Email**: falecom@seuagentedigital.com
+- **Desenvolvedora**: Thaís Souza
+- **Projeto**: Canoa Fit Pro
 
-### Problemas Comuns
+### Recursos Úteis
+- [Documentação Vercel](https://vercel.com/docs)
+- [Vite Documentation](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
-1. **Rotas não funcionam**: Configurar redirects para SPA
-2. **Assets não carregam**: Verificar `base` no vite.config.js
-3. **Build falha**: Verificar versão do Node.js
-4. **Vídeos não carregam**: Verificar CORS e URLs do YouTube
+## 🎯 Checklist de Deploy
 
-### Logs de Debug
+### Antes do Deploy
+- [ ] Build local funcionando
+- [ ] Testes passando
+- [ ] Dependências atualizadas
+- [ ] Variáveis de ambiente configuradas
+- [ ] Domínio configurado (se aplicável)
 
-```bash
-# Build com logs detalhados
-pnpm run build --debug
+### Durante o Deploy
+- [ ] Logs de build sem erros
+- [ ] Deploy concluído com sucesso
+- [ ] URL acessível
+- [ ] Funcionalidades testadas
 
-# Preview com logs
-pnpm run preview --debug
-```
+### Após o Deploy
+- [ ] Performance otimizada
+- [ ] Responsividade testada
+- [ ] Funcionalidades principais funcionando
+- [ ] Monitoramento configurado
 
-## 📱 PWA (Futuro)
+## 🚀 Próximos Passos
 
-Para transformar em PWA:
-
-```bash
-npm install vite-plugin-pwa
-```
-
-Configurar service worker e manifest.
-
-## 🔒 Segurança
-
-- ✅ HTTPS obrigatório
-- ✅ Headers de segurança configurados
-- ✅ Sanitização de URLs de vídeo
-- ✅ Validação de dados de entrada
-
-## 📈 SEO
-
-- ✅ Meta tags configuradas
-- ✅ Open Graph implementado
-- ✅ Sitemap gerado
-- ✅ Robots.txt configurado
+1. **Deploy inicial** no Vercel
+2. **Configuração de domínio** personalizado
+3. **Monitoramento** de performance
+4. **Backup** automático
+5. **CI/CD** pipeline completo
 
 ---
 
-**Escolha a plataforma que melhor se adequa às suas necessidades!** 🚀
+**Criado com ❤️ para a comunidade de canoa Havaiana**
+
+Para suporte técnico: falecom@seuagentedigital.com
 
