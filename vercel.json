@@ -6,7 +6,7 @@
   "regions": ["gru1"],
   "functions": {
     "api/**/*.js": {
-      "runtime": "@vercel/node@18"
+      "runtime": "nodejs18.x"
     }
   },
   "headers": [
