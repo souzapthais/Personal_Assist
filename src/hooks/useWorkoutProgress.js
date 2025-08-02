@@ -1,20 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export const useWorkoutProgress = (trainingData) => {
   const [completedExercises, setCompletedExercises] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load completed exercises from localStorage
+  // Load completed exercises from localStorage with error handling
   useEffect(() => {
-    const saved = localStorage.getItem('completedExercises');
-    if (saved) {
-      setCompletedExercises(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('completedExercises');
+      if (saved) {
+        setCompletedExercises(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Error loading progress:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  // Save completed exercises to localStorage
+  // Save completed exercises with debounce and error handling
   useEffect(() => {
-    localStorage.setItem('completedExercises', JSON.stringify(completedExercises));
-  }, [completedExercises]);
+    if (!isLoading) {
+      const saveTimeout = setTimeout(() => {
+        try {
+          localStorage.setItem('completedExercises', JSON.stringify(completedExercises));
+        } catch (error) {
+          console.error('Error saving progress:', error);
+        }
+      }, 500);
+
+      return () => clearTimeout(saveTimeout);
+    }
+  }, [completedExercises, isLoading]);
 
   const toggleExercise = (exerciseId, completed) => {
     setCompletedExercises(prev => ({
@@ -46,15 +63,21 @@ export const useWorkoutProgress = (trainingData) => {
     return { completed, total, percentage };
   };
 
-  const resetProgress = () => {
-    setCompletedExercises({});
-  };
+  const resetProgress = useCallback(() => {
+    try {
+      localStorage.removeItem('completedExercises');
+      setCompletedExercises({});
+    } catch (error) {
+      console.error('Error resetting progress:', error);
+    }
+  }, []);
 
   return {
     completedExercises,
     toggleExercise,
     getProgressStats,
     getDayProgress,
-    resetProgress
+    resetProgress,
+    isLoading
   };
-}; 
+};
