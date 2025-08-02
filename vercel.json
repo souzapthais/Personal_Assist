@@ -4,11 +4,6 @@
   "framework": "vite",
   "installCommand": "npm install",
   "regions": ["gru1"],
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "vercel-node@1.0.0"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
